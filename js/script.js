@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // const addTimeModal = setTimeout(openModal, 5000);
+    const addTimeModal = setTimeout(openModal, 5000);
 
     function showModalByScroll() {
         if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight -1) {
@@ -154,12 +154,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // offer Slide
 
     class MenuCard {
-        constructor(src, alt, title, descr, price, parentElement) {
+        constructor(src, alt, title, descr, price, parentElement, ...classes) {
             this.src = src;
             this.alt = alt;
             this.title = title;
             this.descr = descr;
             this.price = price;
+            this.classes = classes;
             this.transfer = 449;
             this.changeToUAH();
             this.parent = document.querySelector(parentElement);
@@ -171,8 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         myMenu() {
             const element = document.createElement('div');
+
+            if (this.classes.length === 0) {
+                this.element = 'menu__item'
+                element.classList.add(this.element);
+            } else {
+                this.classes.forEach(className => element.classList.add(className))
+            }
             element.innerHTML = `
-            <div class="menu__item">
                 <img src=${this.src} alt=${this.alt}>
                 <h3 class="menu__item-subtitle">${this.title}</h3>
                 <div class="menu__item-descr">${this.descr}</div>
@@ -180,8 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="menu__item-price">
                     <div class="menu__item-cost">Цена:</div>
                     <div class="menu__item-total"><span>${this.price}</span> тг.</div>
-                </div>
-            </div>`
+                </div>`
 
             this.parent.append(element);
         }
@@ -218,4 +224,3 @@ document.addEventListener('DOMContentLoaded', () => {
         '.menu .container'
         ).myMenu();
 });
-
