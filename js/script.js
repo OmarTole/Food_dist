@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const addTimeModal = setTimeout(openModal, 5000);
+    const addTimeModal = setTimeout(openModal, 50000);
 
     function showModalByScroll() {
         if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight -1) {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('form');
 
     const message = {
-        loading: 'Загрузка',
+        loading: 'img/slider.svg',
         success: 'Спасибо! Скоро мы с вами свяжемся',
         failure: 'Что-то пошло не так...',
     };
@@ -242,10 +242,14 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const statusMessage = document.createElement('div');
-            statusMessage.classList.add('status')
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage)
+            const statusMessage = document.createElement('img');
+            statusMessage.classList.add('slider');
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `
+            statusMessage.setAttribute('src', message.loading);
+            form.insertAdjacentHTML('afterend', statusMessage);
 
             const request = new XMLHttpRequest();
             request.open('POST', 'server.php');
@@ -264,21 +268,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             request.addEventListener('load', () => {
                 if (request.status === 200) {
-                    statusMessage.textContent = message.success;
+                    statusModal(message.success);
                     form.reset();
                     console.log(request.response);
                 } else {
-                    statusMessage.textContent = message.failure;
+                    statusModal(message.failure);
                 }
             })
 
-            setTimeout(() => {
-                const status = document.querySelector('.status');
-                status.remove();
-            }, 2000);
-            
+            // setTimeout(() => {
+            //     const status = document.querySelector('.slider');
+            //     status.remove();
+            // }, 2000);
         })
+    }
 
+    function statusModal(message) {
+        const modalContent= document.querySelector('.modal__content');
+        modalContent.style.display = 'none';
+        openModal();
+
+        const divContent = document.createElement('div'),
+              modalDialog = document.querySelector('.modal__dialog');
+
+        divContent.classList.add('modal__content');
+        divContent.innerHTML = `
+            <div>
+            <div data-close class="modal__close">&times;</div>
+            <div class="modal__tittle">${message}</div>
+            </div>
+        `;
+        modalDialog.append(divContent);
+        
+        setTimeout(() => {
+            divContent.remove();
+            closeModal()
+            modalContent.style.display = 'block';
+        }, 4000)
     }
     
 });
