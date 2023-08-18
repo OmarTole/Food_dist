@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const statusMessage = document.createElement('img');
+            const statusMessage = document.createElement('div');
             statusMessage.classList.add('slider');
             statusMessage.style.cssText = `
                 display: block;
@@ -251,10 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.setAttribute('src', message.loading);
             form.insertAdjacentHTML('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            request.setRequestHeader('Content-type', 'application/json');
             const formData = new FormData(form);
 
             const object = {};
@@ -262,24 +258,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 object[key] = value;
             });
 
-            const json = JSON.stringify(object);
-
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    statusModal(message.success);
-                    form.reset();
-                    console.log(request.response);
-                } else {
-                    statusModal(message.failure);
-                }
+            fetch('server.php', {
+                method: 'POST',
+                body: JSON.stringify(object),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             })
-
-            // setTimeout(() => {
-            //     const status = document.querySelector('.slider');
-            //     status.remove();
-            // }, 2000);
+            .then(data => data.text())
+            .then(data => {
+                statusModal(message.success);
+                form.reset();
+                console.log(data);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                statusModal(message.failure);
+            })
+            .finally(() => {
+                form.reset()
+            })
+            
         })
     }
 
