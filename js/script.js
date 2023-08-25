@@ -366,7 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         indicator.append(dot);
         dots.push(dot);
-        console.log(dots);
     };
 
     function changeCurrentSlide() {
@@ -398,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     next.addEventListener('click', () => {
+
         if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
             offset = 0;
         } else {
@@ -417,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     prev.addEventListener('click', () => {
+        
         if (offset == 0) {
             offset = +width.slice(0, width.length - 2) * (slides.length - 1);
         } else {
@@ -436,6 +437,57 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     
+// Calc
 
+// для мужчин: BMR = 88.36 + (13.4 x вес, кг) + (4.8 х рост, см) – (5.7 х возраст, лет)
+// для женщин: BMR = 447.6 + (9.2 x вес, кг) + (3.1 х рост, cм) – (4.3 х возраст, лет)
+
+// Минимальный уровень активности — 1.2
+// Низкий уровень активности — 1.375
+// Средний уровень активности — 1.55
+// Высокий уровень — 1.725
     
+    const result = document.querySelector('.calculating__result span');
+    let sex, weight, height, age, ratio;    
+
+    function calculationResult() {
+        
+        if (!sex || !weight || !height || !age || !ratio) {
+            result.textContent = "______";
+            return;
+        }
+
+        if (sex == "male") {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        } else {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        }
+
+    }
+
+    calculationResult()
+
+    function chooseActive(parentClass, activeClass) {
+        const elements = document.querySelectorAll(`${parentClass} div`) 
+
+        document.querySelector(parentClass).addEventListener('click', (e) => {
+            if (e.target.getAttribute('data-active')) {
+                ratio = +e.target.getAttribute('data-ratio');
+            } else {
+                sex = e.target.getAttribute('id')
+            }
+
+            console.log(ratio, sex);
+
+            elements.forEach(elem => {
+                elem.classList.remove(activeClass);
+            });
+
+            e.target.classList.add(activeClass);
+        })
+    }
+
+    chooseActive('#gender', 'calculating__choose-item_active')
+    chooseActive('.calculating__choose_big', 'calculating__choose-item_active')
+
 });
