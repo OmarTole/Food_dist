@@ -439,16 +439,48 @@ document.addEventListener('DOMContentLoaded', () => {
     
 // Calc
 
-// для мужчин: BMR = 88.36 + (13.4 x вес, кг) + (4.8 х рост, см) – (5.7 х возраст, лет)
-// для женщин: BMR = 447.6 + (9.2 x вес, кг) + (3.1 х рост, cм) – (4.3 х возраст, лет)
 
-// Минимальный уровень активности — 1.2
-// Низкий уровень активности — 1.375
-// Средний уровень активности — 1.55
-// Высокий уровень — 1.725
-    
     const result = document.querySelector('.calculating__result span');
-    let sex, weight, height, age, ratio;    
+    let sex, weight, height, age, ratio;
+
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex');
+    } else {
+        localStorage.setItem('sex', 'female');
+    }
+
+    if (localStorage.getItem('ratio')) {
+        ratio = localStorage.getItem('ratio');
+    } else {
+        localStorage.setItem('ratio', 1.375);
+    }
+
+    
+
+    // const parentElement2 = document.querySelectorAll('.calculating__choose_big div');
+    // parentElement2.forEach(item => {
+    //     item.classList.remove('calculating__choose-item_active');
+    //     if (item.getAttribute('data-active') == localStorage.getItem('ratio')) {
+    //         item.classList.add('calculating__choose-item_active')
+    //     }
+    // })
+
+    function changeStorageAttribute(parentClass, activeClass) {
+        const parentElement = document.querySelectorAll(`${parentClass} div`);
+        parentElement.forEach(item => {
+            item.classList.remove(activeClass);
+            if (item.getAttribute('id') == localStorage.getItem('sex')) {
+                item.classList.add(activeClass);
+            }
+
+            if (item.getAttribute('data-active') == localStorage.getItem('ratio')) {
+                item.classList.add(activeClass);
+            }
+        })
+    }
+
+    changeStorageAttribute('#gender', 'calculating__choose-item_active');
+    changeStorageAttribute('.calculating__choose_big', 'calculating__choose-item_active');
 
     function calculationResult() {
         
@@ -468,26 +500,65 @@ document.addEventListener('DOMContentLoaded', () => {
     calculationResult()
 
     function chooseActive(parentClass, activeClass) {
-        const elements = document.querySelectorAll(`${parentClass} div`) 
+        const elements = document.querySelectorAll(`${parentClass} div`);
 
-        document.querySelector(parentClass).addEventListener('click', (e) => {
-            if (e.target.getAttribute('data-active')) {
-                ratio = +e.target.getAttribute('data-ratio');
+        elements.forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                if (e.target.getAttribute('data-active')) {
+                    ratio = +e.target.getAttribute('data-active');
+                    localStorage.setItem('ratio', ratio);
+                } else {
+                    sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', sex);
+                }
+    
+                console.log(ratio, sex);
+    
+                elements.forEach(elem => {
+                    elem.classList.remove(activeClass);
+                });
+    
+                e.target.classList.add(activeClass);
+    
+                calculationResult();
+            })
+        })
+
+    }
+
+    chooseActive('#gender', 'calculating__choose-item_active');
+    chooseActive('.calculating__choose_big', 'calculating__choose-item_active');
+
+    function getDynamicInformation(selector) {
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+            if(input.value.match(/\D/g)) {
+                input.style.border = '1px solid red';
             } else {
-                sex = e.target.getAttribute('id')
+                input.style.border = 'none';
             }
 
-            console.log(ratio, sex);
+            switch(selector) {
+                case `#weight`:
+                    weight = input.value;
+                    break;
+                
+                case `#height`:
+                    height = input.value;
+                    break;
 
-            elements.forEach(elem => {
-                elem.classList.remove(activeClass);
-            });
+                case `#age`:
+                    age = input.value;
+                    break;
+            }
 
-            e.target.classList.add(activeClass);
+            calculationResult();
         })
     }
 
-    chooseActive('#gender', 'calculating__choose-item_active')
-    chooseActive('.calculating__choose_big', 'calculating__choose-item_active')
+    getDynamicInformation('#weight');
+    getDynamicInformation('#height');
+    getDynamicInformation('#age');
 
 });
