@@ -568,7 +568,7 @@ module.exports = tabs;
 
 
 function timer() {
-    const date = '2023-08-25';
+    const date = '2023-08-30';
 
     function getTimeDeadline(deadline) {
         let days, hours, minutes, seconds;
